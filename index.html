@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>英语单词游戏</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Poppins:wght@400;600&display=swap');
+
+        :root {
+            --primary-color: #5e72e4;
+            --primary-light: #8292f2;
+            --secondary-color: #f4f5f7;
+            --text-dark: #32325d;
+            --text-light: #6b7280;
+            --background-color: #f8f9fe;
+            --white: #ffffff;
+            --success-color: #2dce89;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, var(--background-color) 0%, #e9ecef 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            transition: all var(--transition-speed) ease;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .input-area label {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-size: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(94, 114, 228, 0.25);
+        }
+
+        button {
+            background: var(--primary-color);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background var(--transition-speed), transform var(--transition-speed), box-shadow var(--transition-speed);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            background: var(--primary-light);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        button:disabled {
+            background-color: #cad1d9;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .card {
+            margin-top: 1.5rem;
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+            text-align: center;
+            position: relative;
+            border: 1px solid #e9ecef;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .word {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            margin-bottom: 1rem;
+            user-select: none;
+            transition: color var(--transition-speed);
+        }
+
+        .word:hover {
+            color: var(--primary-color);
+        }
+
+        .translation {
+            margin: 1.25rem 0;
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--success-color);
+            min-height: 2.5rem;
+            transition: opacity var(--transition-speed);
+        }
+
+        .card-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .progress {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            background-color: var(--white);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+        }
+        
+        .word-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.5s 0.2s ease-out backwards;
+        }
+
+        .word-list-item {
+            background: var(--secondary-color);
+            color: var(--text-dark);
+            border-radius: 6px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .word-list-item:hover {
+            transform: translateY(-2px);
+            background: #dcdce8;
+        }
+        
+        .word-list-item.active {
+            background: var(--primary-color);
+            color: var(--white);
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(94, 114, 228, 0.4);
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 更好的手机适配 */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .word {
+                font-size: 2rem;
+            }
+            .translation {
+                font-size: 1.25rem;
+                min-height: 2rem;
+            }
+            .card-buttons {
+                grid-template-columns: 1fr; /* 按钮垂直排列 */
+            }
+            .word-list-item {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>英语单词游戏</h1>
+        <div class="input-area" id="input-area">
+            <label for="words-input">请输入多个英文单词（用逗号、空格或换行分隔）：</label>
+            <textarea id="words-input" placeholder="例如：apple, banana, orange"></textarea>
+            <button id="start-btn">开始游戏</button>
+        </div>
+        <div id="card-area" style="display:none;"></div>
+        <div id="word-list-area" style="display:none;"></div>
+    </div>
+    <script>
+        // 简单的中英词典（可扩展）
+        const dictionary = {
+            "apple": "苹果",
+            "banana": "香蕉",
+            "orange": "橙子",
+            "cat": "猫",
+            "dog": "狗",
+            "book": "书",
+            "car": "汽车",
+            "computer": "电脑",
+            "school": "学校",
+            "water": "水",
+            "sun": "太阳",
+            "moon": "月亮",
+            "star": "星星",
+            "tree": "树",
+            "flower": "花",
+            "bird": "鸟",
+            "fish": "鱼",
+            "house": "房子",
+            "table": "桌子",
+            "chair": "椅子"
+        };
+
+        // Google翻译API（免费接口已失效，使用web端接口有CORS限制）
+        // 这里用fetch+web端接口做演示，实际部署需后端代理或更换API
+        async function translateWord(word) {
+            // 优先查本地字典
+            if (dictionary[word.toLowerCase()]) {
+                return dictionary[word.toLowerCase()];
+            }
+            // 备用：调用Google翻译web端接口（有CORS限制，部分浏览器本地可用）
+            try {
+                const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&q=${encodeURIComponent(word)}`);
+                const data = await res.json();
+                return data[0][0][0];
+            } catch (e) {
+                return "翻译失败";
+            }
+        }
+
+        // 语音朗读
+        function speakWord(word) {
+            if ('speechSynthesis' in window) {
+                const utter = new SpeechSynthesisUtterance(word);
+                utter.lang = 'en-US';
+                window.speechSynthesis.speak(utter);
+            } else {
+                alert("当前浏览器不支持语音朗读。");
+            }
+        }
+
+        // 处理输入单词
+        function parseWords(input) {
+            // 按逗号、空格、换行分割，去除空项和重复
+            return Array.from(new Set(
+                input
+                    .split(/[\s,，、;；\n]+/)
+                    .map(w => w.trim())
+                    .filter(w => w.length > 0)
+            ));
+        }
+
+        // 渲染单词卡片
+        function renderWordList(words, currentIndex, onSelect) {
+            const listArea = document.getElementById('word-list-area');
+            listArea.innerHTML = '';
+            if (!words || words.length === 0) {
+                listArea.style.display = 'none';
+                return;
+            }
+            listArea.style.display = '';
+            const list = document.createElement('div');
+            list.className = 'word-list';
+            words.forEach((w, i) => {
+                const item = document.createElement('span');
+                item.className = 'word-list-item' + (i === currentIndex ? ' active' : '');
+                item.textContent = w;
+                item.title = '切换到该单词';
+                item.onclick = () => {
+                    onSelect(i);
+                };
+                list.appendChild(item);
+            });
+            listArea.appendChild(list);
+        }
+
+        function renderCard(words, index) {
+            const cardArea = document.getElementById('card-area');
+            cardArea.innerHTML = ''; // 清空
+            if (index < 0 || index >= words.length) return;
+
+            // 渲染单词列表
+            renderWordList(words, index, (i) => renderCard(words, i));
+
+            const word = words[index];
+
+            // 卡片结构
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            // 进度
+            const progress = document.createElement('div');
+            progress.className = 'progress';
+            progress.textContent = `${index + 1} / ${words.length}`;
+            card.appendChild(progress);
+
+            // 单词
+            const wordDiv = document.createElement('div');
+            wordDiv.className = 'word';
+            wordDiv.textContent = word;
+            wordDiv.title = "点击朗读";
+            wordDiv.onclick = () => speakWord(word);
+            card.appendChild(wordDiv);
+
+            // 翻译
+            const translationDiv = document.createElement('div');
+            translationDiv.className = 'translation';
+            card.appendChild(translationDiv);
+
+            // 按钮
+            const btnArea = document.createElement('div');
+            btnArea.className = 'card-buttons';
+
+            const translateBtn = document.createElement('button');
+            translateBtn.textContent = '翻译';
+            translateBtn.onclick = async () => {
+                translateBtn.disabled = true;
+                translateBtn.textContent = "翻译中...";
+                const translation = await translateWord(word);
+                translationDiv.textContent = translation;
+                translateBtn.textContent = "翻译";
+                translateBtn.disabled = false;
+            };
+            btnArea.appendChild(translateBtn);
+
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = (index === words.length - 1) ? '完成' : '下一个';
+            nextBtn.onclick = () => {
+                if (index < words.length - 1) {
+                    renderCard(words, index + 1);
+                } else {
+                    // 游戏结束
+                    cardArea.innerHTML = `<div style="text-align:center;font-size:1.3rem;padding:32px 0;">🎉 恭喜你完成所有单词！</div>
+                    <button style="margin-top:12px;width:100%;" onclick="location.reload()">重新开始</button>`;
+                }
+            };
+            btnArea.appendChild(nextBtn);
+
+            card.appendChild(btnArea);
+
+            cardArea.appendChild(card);
+        }
+
+        // 事件绑定
+        document.getElementById('start-btn').onclick = function() {
+            const input = document.getElementById('words-input').value;
+            const words = parseWords(input);
+            if (words.length === 0) {
+                alert("请输入至少一个英文单词！");
+                return;
+            }
+            document.getElementById('input-area').style.display = 'none';
+            document.getElementById('card-area').style.display = '';
+            document.getElementById('word-list-area').style.display = '';
+            renderCard(words, 0);
+        };
+
+        // 回车快捷键支持
+        document.getElementById('words-input').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                document.getElementById('start-btn').click();
+            }
+        });
+    </script>
+</body>
+</html>
